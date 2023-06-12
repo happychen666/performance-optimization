@@ -27,35 +27,59 @@ self.addEventListener("install", function (event) {
   );
 });
 
-self.addEventListener("activate", function (event) {
-  console.log("activate");
-  return self.clients.claim();
-});
-
-// 拦截网络请求
+// 拦截并缓存网络请求
 self.addEventListener("fetch", function (event) {
-  //拦截符合
   var allowedHosts = /(localhost|fonts\.googleapis\.com|fonts\.gtatic\.com)/i,
-    //阻止符合这个正则表达式的资源存储到service worker缓存
-    deniedAssets = /(sw\.js|sw-install\.js)$/i;
+    deniedAssets = /(sw\.js|sw-install\.js)$/i,
+    htmlDocument = /(\/|\.html)$/i;
   if (
     allowedHosts.test(event.request.url) === true &&
     deniedAssets.test(event.request.url) === false
   ) {
-    //使用event对象的respondWith方法拦截请求，绕过这个方法就会发生默认浏览器行为
-    event.respondWith(
-      caches.match(event.request).then(function (cachedResponse) {
-        return (
-          // 遇到不在缓存中的资源请求，则用 fetch 方法从网络中检索
-          cachedResponse ||
-          fetch(event.request).then(function (fetchedResponse) {
+    if (htmlDocument.test(event.request.url) === true) {
+      event.respondWith(
+        fetch(event.request)
+          .then(function (response) {
             caches.open(cacheVersion).then(function (cache) {
-              cache.put(event.request, fetchedResponse.clone());
+              cache.put(event.request, response.clone());
             });
-            return fetchedResponse;
+            return response;
           })
-        );
-      })
-    );
+          .catch(function () {
+            return caches.match(event.request);
+          })
+      );
+    } else {
+      event.respondWith(
+        caches.match(event.request).then(function (cachedResponse) {
+          return (
+            cachedResponse ||
+            fetch(event.request).then(function (fetchedResponse) {
+              caches.open(cacheVersion).then(function (cache) {
+                cache.put(event.request, fetchedResponse);
+              });
+              return fetchedResponse.clone();
+            })
+          );
+        })
+      );
+    }
   }
+});
+
+// 清理缓存
+self.addEventListener("activate", function (event) {
+  var chacheWhitelist = ["v2"];
+  event.waitUnitil(
+    caches.keys().then(function (keyList) {
+      return Promise.all([
+        keyList.map(function (key) {
+          if (chacheWhitelist.indexOf(key) === -1) {
+            return caches.delete(key);
+          }
+        }),
+        selfclients.claim(),
+      ]);
+    })
+  );
 });
