@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>防抖</title>
+        <meta charset="utf-8" />
+        <style>
+            #container {
+                width: 100%;
+                height: 200px;
+                line-height: 200px;
+                text-align: center;
+                color: #fff;
+                background-color: #444;
+                font-size: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script type="text/javascript">
+            var count = 1;
+            var container = document.getElementById('container');
+
+            function getUserAction() {
+                container.innerHTML = count++;
+            }
+
+            // container.onmousemove = getUserAction;
+            // 防抖方法一
+            container.onmousemove = debounce(getUserAction, 1000);
+
+            function debounce(func, wait) {
+                var timeout;
+                return function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(func, wait);
+                };
+            }
+
+            /* 
+            一旦触发onmousemove，先清除定时器，随后再开一个定时器，指定时间后执行函数。这就实现了一个简易的防抖，指定时间内重复触发函数只会执行一次。已经很好的解决了高频重复触发的问题，方法一中直接重写了onmousemove函数，this与event均丢失了。
+            */
+
+            /* 
+            先解决this指向问题，正常在onmousemove函数中，this指向的应该是调用函数的对象，也就是container，因为在debounce中返回了真正重写onmousemove的函数，形成了一个闭包，导致this丢失。指定this指向的方法有apply与call，用法差别只在参数，call需要的是一个数组，这里就用apply。
+            */
+
+            //防抖(非立即执行)
+            function debounce_1(fn, wait) {
+                let timerId = null;
+                return function () {
+                    clearTimeout(timerId);
+                    timerId = setTimeout(() => {
+                        fn.apply(this, arguments);
+                    }, wait);
+                };
+            }
+
+            //防抖(立即执行)
+            function debounce_2(fn, wait) {
+                let timerId = null;
+                let flag = true;
+                return function () {
+                    clearTimeout(timerId);
+                    if (flag) {
+                        fn.apply(this, arguments);
+                        flag = false;
+                    }
+                    timerId = setTimeout(() => {
+                        flag = true;
+                    }, wait);
+                };
+            }
+
+            //防抖(合并版)
+            function debounce_merge(fn, wait = 500, isImmediate = false) {
+                let timerId = null;
+                let flag = true;
+                if (isImmediate) {
+                    return function () {
+                        clearTimeout(timerId);
+                        if (flag) {
+                            fn.apply(this, arguments);
+                            flag = false;
+                        }
+                        timerId = setTimeout(() => {
+                            flag = true;
+                        }, wait);
+                    };
+                }
+                return function () {
+                    clearTimeout(timerId);
+                    timerId = setTimeout(() => {
+                        fn.apply(this, arguments);
+                    }, wait);
+                };
+            }
+        </script>
+    </body>
+</html>

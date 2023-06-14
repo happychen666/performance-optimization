@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>节流</title>
+    </head>
+    <body></body>
+    <script>
+        //定义函数
+        //节流(非立即执行)
+        function throttle_1(fn, wait) {
+            let flag = true;
+            return function () {
+                if (flag == true) {
+                    flag = false;
+                    var timer = setTimeout(() => {
+                        fn.apply(this, arguments);
+                        flag = true;
+                    }, wait);
+                }
+            };
+        }
+
+        //节流(立即执行)
+        function throttle_2(fn, wait) {
+            var flag = true;
+            var timer = null;
+            return function () {
+                if (flag) {
+                    fn.apply(this, arguments);
+                    flag = false;
+                    timer = setTimeout(() => {
+                        flag = true;
+                    }, wait);
+                }
+            };
+        }
+
+        //节流(合并)
+        function throttle_merge(fn, wait = 500, isImmediate = false) {
+            let flag = true;
+            let timer = null;
+
+            if (isImmediate) {
+                return function () {
+                    if (flag) {
+                        fn.apply(this, arguments);
+                        flag = false;
+                        timer = setTimeout(() => {
+                            flag = true;
+                        }, wait);
+                    }
+                };
+            }
+
+            return function () {
+                if (flag == true) {
+                    flag = false;
+                    var timer = setTimeout(() => {
+                        fn.apply(this, arguments);
+                        flag = true;
+                    }, wait);
+                }
+            };
+        }
+    </script>
+</html>
