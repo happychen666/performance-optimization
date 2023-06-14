@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>图片懒加载</title>
+    <link href="./css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="view">
+      <img
+        data-src="https://ts1.cn.mm.bing.net/th/id/R-C.68d0feabdcc64ae6838db27a976a440f?rik=C1Wy5vJ9gRn%2fzQ&riu=http%3a%2f%2ftour.youth.cn%2fxw%2f202203%2fW020220302343706665093.jpg&ehk=xO5wjaA8ZuauoAvZ%2bNz2upux8EPRvJ5Y4QFcMdrTiYw%3d&risl=&pid=ImgRaw&r=0"
+        class="lazy-image"
+      />
+      <img
+        data-src="https://img.zcool.cn/community/015b575c7bd7a1a801213f265953c4.jpg?x-oss-process=image/auto-orient,1/resize,m_lfit,w_1280,limit_1/sharpen,100"
+        class="lazy-image"
+      />
+      <img
+        data-src="https://r1.visitbeijing.com.cn/vbj-s/2020/0421/20200421050008753.jpg"
+        class="lazy-image"
+      />
+      <img
+        data-src="https://topart.cn/Uploads/640/2016-04-07/b_5705fdf6dc3f1.jpg"
+        class="lazy-image"
+      />
+      <img
+        data-src="http://imgsrc.baidu.com/image/c0%3Dpixel_huitu%2C0%2C0%2C294%2C40/sign=5a7938d38acb39dbd5cd6f16b96e6c48/aec379310a55b3196c79de4c48a98226cffc1702.jpg"
+        class="lazy-image"
+      />
+      <img
+        data-src="http://c.hiphotos.baidu.com/zhidao/pic/item/8d5494eef01f3a2987a8062f9f25bc315d607ceb.jpg"
+        class="lazy-image"
+      />
+    </div>
+  </body>
+  <link href="./css/style.css" rel="stylesheet" />
+  <script src="js/lazy-image.js"></script>
+  <script>
+    console.log(document.documentElement.clientHeight);
+    new LazyImage(".lazy-image");
+  </script>
+</html>
